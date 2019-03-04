@@ -237,7 +237,7 @@ function exec (code: string, filename: string) {
  */
 function startRepl () {
   const repl = start({
-    prompt: '> ',
+    prompt: '\u001b[33m\u001b[00m ',
     input: process.stdin,
     output: process.stdout,
     terminal: process.stdout.isTTY,
