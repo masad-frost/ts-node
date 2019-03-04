@@ -1,19 +1,13 @@
 #!/usr/bin/env node
 
-import { join, resolve } from 'path';
-import { start, Recoverable } from 'repl';
-import { inspect } from 'util';
-import Module = require('module');
-import arg = require('arg');
-import { diffLines } from 'diff';
-import { Script, createContext, runInContext } from 'vm';
-import { readFileSync, statSync } from 'fs';
-import { register, VERSION, DEFAULTS, TSError, parse } from './index';
-import { V4MAPPED } from 'dns';
+import { join } from 'path'
+import { start, Recoverable } from 'repl'
+import { diffLines } from 'diff'
+import { Script } from 'vm'
+import { readFileSync, statSync } from 'fs'
+import { register, DEFAULTS, TSError } from './index'
 
 const cwd = process.cwd()
-const help = false
-const version = 0
 const files = DEFAULTS.files
 const compiler = DEFAULTS.compiler
 const compilerOptions = DEFAULTS.compilerOptions
@@ -101,16 +95,13 @@ function startRepl () {
   _eval(mainFile)
 
   const repl = start({
-    // \u001b[33m\u001b[00m
-    prompt: '> ',
+    prompt: '\u001b[33m\u001b[00m ',
     input: process.stdin,
     output: process.stdout,
     terminal: process.stdout.isTTY,
     eval: replEval,
     useGlobal: true
   })
-
-
 
   // Bookmark the point where we should reset the REPL state.
   const resetEval = appendEval('')
