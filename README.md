@@ -1,3 +1,5 @@
+Forked for repl.it
+
 # ![TypeScript Node](logo.svg)
 
 [![NPM version][npm-image]][npm-url]
