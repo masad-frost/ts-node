@@ -1,19 +1,30 @@
 #!/usr/bin/env node
 import { join } from 'path'
+import { PassThrough } from 'stream'
 import { start, Recoverable } from 'repl'
 import { diffLines } from 'diff'
 // @ts-ignore
 import { Script, createScript } from 'vm'
 import { readFileSync, statSync } from 'fs'
 import { register, DEFAULTS, TSError } from './index'
+import arg = require('arg')
 
-const withMain = !!process.argv[2]
+const args = arg({
+  '--project': String
+}, {
+  stopAtPositional: true
+})
+
+const {
+  '--project': project = DEFAULTS.project
+} = args
+
+const withMain = args['_'].length
 
 const cwd = process.cwd()
 const files = DEFAULTS.files
 const compiler = DEFAULTS.compiler
 const compilerOptions = DEFAULTS.compilerOptions
-const project = DEFAULTS.project
 const ignoreDiagnostics = DEFAULTS.ignoreDiagnostics
 const ignore = DEFAULTS.ignore
 const transpileOnly = DEFAULTS.transpileOnly
@@ -93,10 +104,22 @@ function exec (code: string, filename: string) {
  * Start a CLI REPL.
  */
 function startRepl () {
+  const pass = new PassThrough()
+  const originalWrite = pass._write
+
+  if (withMain) {
+    // @ts-ignore
+    pass._write = (_, __, done) => {
+      done()
+    }
+  }
+
+  pass.pipe(process.stdout)
+
   const repl = start({
     prompt: '\u001b[33m\u001b[00m ',
     input: process.stdin,
-    output: process.stdout,
+    output: pass,
     terminal: process.stdout.isTTY,
     eval: replEval,
     useGlobal: true
@@ -125,11 +148,13 @@ function startRepl () {
       displayErrors: true
     })
 
-    repl.write('\x1B[H')
-
     script.runInThisContext({
       displayErrors: false
     })
+
+    pass._write = originalWrite
+
+    repl.displayPrompt()
   }
 
   repl.defineCommand('type', {
