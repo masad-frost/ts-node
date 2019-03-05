@@ -19,7 +19,7 @@ const {
   '--project': project = DEFAULTS.project
 } = args
 
-const withMain = args['_'].length
+const mainFilePath = args['_'][0]
 
 const cwd = process.cwd()
 const files = DEFAULTS.files
@@ -107,7 +107,7 @@ function startRepl () {
   const pass = new PassThrough()
   const originalWrite = pass._write
 
-  if (withMain) {
+  if (mainFilePath) {
     // @ts-ignore
     pass._write = (_, __, done) => {
       done()
@@ -138,8 +138,7 @@ function startRepl () {
   reset()
   repl.on('reset', reset)
 
-  if (withMain) {
-    const mainFilePath = '/home/runner/index.ts'
+  if (mainFilePath) {
     const mainFile = readFileSync(mainFilePath, 'utf-8')
     const output = service.compile(mainFile, mainFilePath, -0)
 
