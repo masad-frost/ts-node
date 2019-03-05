@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-
 import { join } from 'path'
 import { start, Recoverable } from 'repl'
 import { diffLines } from 'diff'
-import { Script } from 'vm'
+// @ts-ignore
+import { Script, createScript } from 'vm'
 import { readFileSync, statSync } from 'fs'
 import { register, DEFAULTS, TSError } from './index'
+
+const withMain = !!process.argv[2]
 
 const cwd = process.cwd()
 const files = DEFAULTS.files
@@ -40,8 +42,8 @@ const service = register({
 /**
  * Eval helpers.
  */
-const EVAL_FILENAME = `[eval].ts`
-const EVAL_PATH = join(cwd, EVAL_FILENAME)
+let EVAL_FILENAME = '[eval].ts'
+let EVAL_PATH = join(cwd, EVAL_FILENAME)
 const EVAL_INSTANCE = { input: '', output: '', version: 0, lines: 0 }
 
 // Execute the main contents (either eval, script or piped).
@@ -91,9 +93,6 @@ function exec (code: string, filename: string) {
  * Start a CLI REPL.
  */
 function startRepl () {
-  const mainFile = readFileSync('/home/runner/index.ts').toString('utf-8')
-  _eval(mainFile)
-
   const repl = start({
     prompt: '\u001b[33m\u001b[00m ',
     input: process.stdin,
@@ -115,6 +114,23 @@ function startRepl () {
 
   reset()
   repl.on('reset', reset)
+
+  if (withMain) {
+    const mainFilePath = '/home/runner/index.ts'
+    const mainFile = readFileSync(mainFilePath, 'utf-8')
+    const output = service.compile(mainFile, mainFilePath, -0)
+
+    const script = createScript(output, {
+      filename: mainFilePath,
+      displayErrors: true
+    })
+
+    repl.write('\x1B[H')
+
+    script.runInThisContext({
+      displayErrors: false
+    })
+  }
 
   repl.defineCommand('type', {
     help: 'Check the type of a TypeScript identifier',
