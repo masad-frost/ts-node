@@ -53,7 +53,7 @@ const service = register({
 /**
  * Eval helpers.
  */
-let EVAL_FILENAME = '[eval].ts'
+let EVAL_FILENAME = mainFilePath || '[eval].ts'
 let EVAL_PATH = join(cwd, EVAL_FILENAME)
 const EVAL_INSTANCE = { input: '', output: '', version: 0, lines: 0 }
 
@@ -140,7 +140,7 @@ function startRepl () {
 
   if (mainFilePath) {
     const mainFile = readFileSync(mainFilePath, 'utf-8')
-    const output = service.compile(mainFile, mainFilePath, -0)
+    const output = service.compile(mainFile, EVAL_PATH, -0)
 
     EVAL_INSTANCE.output = output
     appendEval(mainFile)
