@@ -1,6 +1,6 @@
 {
   "name": "ts-node-fm",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "TypeScript execution environment and REPL for node.js, with source map support",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
