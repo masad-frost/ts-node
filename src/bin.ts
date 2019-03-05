@@ -71,10 +71,12 @@ function _eval (input: string) {
   let output: string
 
   console.log('input', JSON.stringify(input))
+  console.log('eval input', JSON.stringify(EVAL_INSTANCE.input))
 
   try {
     output = service.compile(EVAL_INSTANCE.input, EVAL_PATH, -lines)
   } catch (err) {
+    console.log('compile error', err)
     undo()
     throw err
   }
