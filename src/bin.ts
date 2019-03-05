@@ -143,6 +143,9 @@ function startRepl () {
     const mainFile = readFileSync(mainFilePath, 'utf-8')
     const output = service.compile(mainFile, mainFilePath, -0)
 
+    EVAL_INSTANCE.output = output
+    appendEval(mainFile)
+
     const script = createScript(output, {
       filename: mainFilePath,
       displayErrors: true
