@@ -70,31 +70,21 @@ function _eval (input: string) {
   const undo = appendEval(input)
   let output: string
 
-  console.log('input', JSON.stringify(input))
-  console.log('eval input', JSON.stringify(EVAL_INSTANCE.input))
-
   try {
     output = service.compile(EVAL_INSTANCE.input, EVAL_PATH, -lines)
   } catch (err) {
-    console.log('compile error', err)
     undo()
     throw err
   }
-
-  console.log('compile output ', output)
 
   // Use `diff` to check for new JavaScript to execute.
   const changes = diffLines(EVAL_INSTANCE.output, output)
 
   if (isCompletion) {
-    console.log('completion', EVAL_INSTANCE.output)
     undo()
   } else {
-    console.log('updated output (no completion)')
     EVAL_INSTANCE.output = output
   }
-
-  console.log('changes ', changes)
 
   return changes.reduce((result, change) => {
     return change.added ? exec(change.value, EVAL_FILENAME) : result
@@ -105,7 +95,6 @@ function _eval (input: string) {
  * Execute some code.
  */
 function exec (code: string, filename: string) {
-  console.log('execed', JSON.stringify(code));
   const script = new Script(code, { filename: filename })
 
   return script.runInThisContext()
@@ -150,7 +139,7 @@ function startRepl () {
   repl.on('reset', reset)
 
   if (mainFilePath) {
-    const mainFile = readFileSync(mainFilePath, 'utf-8')
+    const mainFile = readFileSync(mainFilePath, 'utf-8') + '\n'
     const output = service.compile(mainFile, EVAL_PATH, -0)
 
     EVAL_INSTANCE.output = output
