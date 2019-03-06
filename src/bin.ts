@@ -5,7 +5,7 @@ import { start, Recoverable } from 'repl'
 import { diffLines } from 'diff'
 // @ts-ignore
 import { Script, createScript } from 'vm'
-import { readFileSync, statSync } from 'fs'
+import { readFileSync, statSync, existsSync } from 'fs'
 import { register, DEFAULTS, TSError } from './index'
 import arg = require('arg')
 
@@ -15,9 +15,13 @@ const args = arg({
   stopAtPositional: true
 })
 
-const {
-  '--project': project = DEFAULTS.project
+let {
+  '--project': project
 } = args
+
+if (!project || !existsSync(project)) {
+  project = DEFAULTS.project
+}
 
 const mainFilePath = args['_'][0]
 
